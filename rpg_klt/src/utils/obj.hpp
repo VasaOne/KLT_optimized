@@ -17,3 +17,5 @@ typedef struct {
 	int size;
 	coor_t list[];
 } features;
+
+void fit_block(int N_max_feature, params_t image_param, params_t* block );

@@ -12,12 +12,11 @@ void fit_block(int N_max_feature, params_t image_param, params_t* block ){
 		n_feature = get_number_feature(image_param, dim);
 	
 	}
-	std::cout << n_feature << std::endl;
 	(*block).width = dim;
 	(*block).height = dim;
 	return;
 }
-
+/*
 int main(){
 	params_t image = {640,600};
 	params_t block;
@@ -28,4 +27,4 @@ int main(){
 	return 0;
 }
 
-
+*/
