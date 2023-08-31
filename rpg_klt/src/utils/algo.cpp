@@ -16,6 +16,21 @@ void fit_block(int N_max_feature, params_t image_param, params_t* block ){
 	(*block).height = dim;
 	return;
 }
+
+features::features(int size){
+	this->size = size;
+	coor_t list[size];
+	return;
+}
+
+int get_px_val(int x, int y, int image[]){
+	return image[x + y * WIDTH_IMAGE];		
+}
+
+int feature_score(int image[], int HookUpTable[], int treshold){
+	//corner FAST test
+	
+}
 /*
 int main(){
 	params_t image = {640,600};
@@ -28,3 +43,5 @@ int main(){
 }
 
 */
+
+

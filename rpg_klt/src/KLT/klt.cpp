@@ -10,7 +10,11 @@ KLT::KLT(float threshold, params_t image_param, int max_feature){
 	fit_block(max_feature, image_param, &(this->block_param));
 }
 
-
+features get_features(float image[]){	
+	features ftr();
+	//kernel call
+	return ftr;
+}
 
 params_t KLT::get_block_param(){
 	return this->block_param;
@@ -27,10 +31,12 @@ params_t KLT::get_image_param(){
 params_t KLT::get_block_param(){
 	return this->block_param;
 }
+
+/*
 int main() {
 	params_t jsp = {1, 1};
 	KLT klter(3.0, jsp, 5);
 	std::cout << klter.get_threshold() << std::endl;
 	std::cout << klter.get_image_param().height << std::endl;
 	return 1;
-}
+}*/
