@@ -13,6 +13,7 @@ typedef struct {
 typedef struct {
 	int x;
 	int y;
+	int score;
 } coor_t;
 
 typedef struct features{

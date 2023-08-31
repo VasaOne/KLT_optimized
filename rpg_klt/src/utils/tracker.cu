@@ -56,10 +56,9 @@ __device__ int feature_score_calculus(int x_center, int y_center, int image[]){
 		score += abs( img_val_px(nx, ny, image) - img_val_px(x_center, y_center, image) );
 	}
 	return score;
-}
-/*__global__ void feature_score_calculus(int image[], features* ftr) {
 	
-} */
+
+
 
 
 __global__ void testor(){

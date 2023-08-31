@@ -1,7 +1,7 @@
 #pragma once
 
 #include "obj.hpp"
-
+#define L 4
 class KLT {
 	public:
 		KLT(float threshold, params_t image_param, int max_feature);
