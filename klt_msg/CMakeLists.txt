@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(rpg_klt)
+project(klt_msg)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
@@ -7,18 +7,9 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
-find_package(rclcpp REQUIRED)
-find_package(sensor_msgs REQUIRED)
-find_package(klt_msg REQUIRED)
 
-
-
-
-
-add_executable(klt_node src/run_klt.cpp)
-ament_target_dependencies(klt_node rclcpp sensor_msgs klt_msg)
-
-install(TARGETS klt_node DESTINATION lib/${PROJECT_NAME})
+find_package(rosidl_default_generators REQUIRED)
+rosidl_generate_interfaces(${PROJECT_NAME} "msg/Ftr.msg" "msg/FeatureList.msg" )
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

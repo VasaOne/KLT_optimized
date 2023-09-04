@@ -15,3 +15,5 @@ class KLT {
 		params_t image_param;
 		params_t block_param;
 };
+
+__global__ void kernel_feature_calculus(int image[], params_t block_param, features ftr_final_list);
