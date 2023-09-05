@@ -1,7 +1,5 @@
 #include <stdio.h>
-#define HK_size 8192 // to get a bit for every 16-bit vectors
-
-__device__ char HookUpTable[HK_size];
+#include "hookup.hu"
 
 
 

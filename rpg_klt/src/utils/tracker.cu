@@ -1,6 +1,8 @@
 #include <stdio.h>
 
 #include "obj.hpp"
+#include "fast.hu"
+
 #define range_condition(x,y,element_id) (0<= x + elementFAST[element_id][0]) && (x + elementFAST[element_id][0] < WIDTH_IMAGE) && (0 <= y + elementFAST[element_id][1]) && (y + elementFAST[element_id][1] < HEIGHT_IMAGE) //macro to check if a point is inside the image
 
 #define img_val_px(x, y, image) image[y*WIDTH_IMAGE + x]
@@ -58,7 +60,7 @@ __device__ int feature_score_calculus(int x_center, int y_center, int image[]){
 	return score;
 	
 
-
+}
 
 
 __global__ void testor(){

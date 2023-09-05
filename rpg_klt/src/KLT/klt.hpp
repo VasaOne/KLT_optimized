@@ -17,4 +17,4 @@ class KLT {
 };
 
 
-void wrapper_kernel_feature_calculus(int image[], params_t block_param, features ftr_final_list);
+void wrapper_kernel_feature_calculus(int image[], params_t block_param, features ftr_final_list, int threshold);

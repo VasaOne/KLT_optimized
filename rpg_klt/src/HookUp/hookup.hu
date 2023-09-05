@@ -1,0 +1,11 @@
+#define HK_size 8192 // to get a bit for every 16-bit vectors
+
+__device__ char HookUpTable[HK_size];
+
+__device__ void set_HKpoint(int addr);
+
+__device__ void clear_HKpoint(int addr);
+
+__device__ int get_HKpoint(int addr);
+
+__global__ void HookUpInit(int pointcondition);

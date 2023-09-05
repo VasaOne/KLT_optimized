@@ -18,7 +18,7 @@ typedef struct {
 
 typedef struct features{
 	int size;
-	coor_t lst[N_MAX_FEATURE];
+	coor_t list[N_MAX_FEATURE];
 	features(int size);
 	features(){ size = 0;};
 } features;

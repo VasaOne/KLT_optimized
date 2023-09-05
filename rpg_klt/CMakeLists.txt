@@ -1,9 +1,11 @@
-cmake_minimum_required(VERSION 3.8)
-project(rpg_klt)
+cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
+project(rpg_klt LANGUAGES CXX CUDA)
 
-if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-Wall -Wextra -Wpedantic)
-endif()
+#if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+#  add_compile_options(-Wall -Wextra -Wpedantic)
+#endif()
+
+enable_language(CUDA)
 
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
@@ -13,11 +15,16 @@ find_package(klt_msg REQUIRED)
 include_directories( src/ )
 include_directories( src/utils/ )
 include_directories( src/KLT/ )
+include_directories( src/HookUp/ )
 
 add_executable(klt_node src/run_klt.cpp
         src/KLT/klt.hpp	
 	src/KLT/klt.cpp
-        src/utils/obj.hpp	
+	src/KLT/ftr_kernels.cu
+	src/HookUp/hookup.cu
+	src/HookUp/hookup.hu
+        src/utils/obj.hpp
+	src/utils/tracker.cu	
 	src/utils/algo.cpp)
 ament_target_dependencies(klt_node rclcpp sensor_msgs klt_msg)
 
