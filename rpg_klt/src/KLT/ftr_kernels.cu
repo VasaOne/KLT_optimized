@@ -57,3 +57,8 @@ __global__ void kernel_feature_calculus(int image[], params_t block_param, featu
 	}
 	return;
 }
+
+void wrapper_kernel_feature_calculus(int image[], params_t block_param, features ftr_final_list){
+	kernel_feature_calculus<<<1,1>>>(image[], block_param, ftr_final_list);
+	return;
+}

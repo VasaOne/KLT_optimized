@@ -5,17 +5,20 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-# find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(klt_msg REQUIRED)
 
+include_directories( src/ )
+include_directories( src/utils/ )
+include_directories( src/KLT/ )
 
-
-
-
-add_executable(klt_node src/run_klt.cpp)
+add_executable(klt_node src/run_klt.cpp
+        src/KLT/klt.hpp	
+	src/KLT/klt.cpp
+        src/utils/obj.hpp	
+	src/utils/algo.cpp)
 ament_target_dependencies(klt_node rclcpp sensor_msgs klt_msg)
 
 install(TARGETS klt_node DESTINATION lib/${PROJECT_NAME})

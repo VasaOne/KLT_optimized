@@ -11,7 +11,7 @@ KLT::KLT(float threshold, params_t image_param, int max_feature){
 }
 
 features get_features(float image[]){	
-	features ftr();
+	features ftr;
 	//kernel call
 	return ftr;
 }
@@ -26,10 +26,6 @@ float KLT::get_threshold(){
 
 params_t KLT::get_image_param(){
 	return this->image_param;
-}
-
-params_t KLT::get_block_param(){
-	return this->block_param;
 }
 
 /*

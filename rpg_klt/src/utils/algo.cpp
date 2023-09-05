@@ -29,7 +29,7 @@ int get_px_val(int x, int y, int image[]){
 
 int feature_score(int image[], int HookUpTable[], int treshold){
 	//corner FAST test
-	
+	return 0; 	
 }
 /*
 int main(){
