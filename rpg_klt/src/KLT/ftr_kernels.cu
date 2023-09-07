@@ -17,7 +17,7 @@ __device__ int FASTalgorithme(int x, int y,int image[], int threshold){
 
 
 __global__ void kernel_feature_calculus(int image[], params_t block_param, features ftr_final_list, int threshold){
-	__shared__ coor_t feature_list[block_param.width * block_param.height]; // list of all the features to find the best one with a reduction after
+	__shared__ coor_t feature_list[WIDTH_IMAGE ]; // list of all the features to find the best one with a reduction after
 	
 	int max_score = 0;
 	int new_score = 0;

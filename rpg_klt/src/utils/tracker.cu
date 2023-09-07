@@ -8,7 +8,7 @@
 #define img_val_px(x, y, image) image[y*WIDTH_IMAGE + x]
 
 
-__device__ int elementFAST[16][2] = // {... {x,y} ...}
+ __device__ int elementFAST[16][2] = // {... {x,y} ...}
 {
 	{0,3},
 	{1,3},
@@ -62,7 +62,7 @@ __device__ int feature_score_calculus(int x_center, int y_center, int image[]){
 
 }
 
-
+/*
 __global__ void testor(){
 	int dk = fastBrighter(56, 68, 30);
 	int br_1 = fastBrighter(56, 198,30);
@@ -95,4 +95,4 @@ int main(){
 	cudaDeviceSynchronize();
 	return 1;
 }
-
+*/

@@ -2,7 +2,7 @@
 #include "hookup.hu"
 
 
-
+__device__ char HookUpTable[HK_size];
 
 __device__ void set_HKpoint(int addr){
 	HookUpTable[addr & 0x1FF] = HookUpTable[addr & 0x1FF] | (1 << (addr >> 13));
@@ -35,6 +35,8 @@ __global__ void HookUpInit(int pointcondition){
 	}
 	clear_HKpoint(addr);
 }
+
+/*
 __global__ void testor(){
 	printf("for 3: %i \n", get_HKpoint(3));
 	printf("for 5: %i \n", get_HKpoint(5));
@@ -49,3 +51,4 @@ int main(){
 	cudaDeviceSynchronize();
 	return 1;
 }
+*/

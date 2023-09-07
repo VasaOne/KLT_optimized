@@ -2,8 +2,8 @@
 #pragma once
 
 #define max_block_size 256
-#define WIDTH_IMAGE 16
-#define HEIGHT_IMAGE 9
+#define WIDTH_IMAGE 460
+#define HEIGHT_IMAGE 400
 #define N_MAX_FEATURE
 typedef struct {
 	int width;
