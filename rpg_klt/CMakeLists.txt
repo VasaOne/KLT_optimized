@@ -11,6 +11,7 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(klt_msg REQUIRED)
+find_package(OpenCV REQUIRED)
 
 include_directories( src/ )
 include_directories( src/utils/ )
@@ -28,7 +29,11 @@ add_executable(klt_node src/run_klt.cpp
 	src/utils/algo.cpp)
 ament_target_dependencies(klt_node rclcpp sensor_msgs klt_msg)
 
+add_executable(test_klt src/test_klt.cpp)
+ament_target_dependencies(test_klt rclcpp sensor_msgs klt_msg OpenCV)
+
 install(TARGETS klt_node DESTINATION lib/${PROJECT_NAME})
+install(TARGETS test_klt DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
