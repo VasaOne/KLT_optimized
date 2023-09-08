@@ -13,7 +13,8 @@ find_package(sensor_msgs REQUIRED)
 find_package(klt_msg REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(CUDA REQUIRED)
-
+find_package(std_msgs REQUIRED)
+find_package(cv_bridge REQUIRED)
 
 
 
@@ -41,7 +42,7 @@ CUDA_ADD_EXECUTABLE(klt_node ${CUDA_FILES} ${CPP_FILES})
 
 
 add_executable(test_klt src/test_klt.cpp)
-ament_target_dependencies(test_klt rclcpp sensor_msgs klt_msg OpenCV)
+ament_target_dependencies(test_klt rclcpp sensor_msgs klt_msg OpenCV std_msgs cv_bridge)
 ament_target_dependencies(klt_node rclcpp sensor_msgs klt_msg OpenCV)
 
 #target_compile_options(klt_node PRIVATE $<$<COMPILE_LANGUAGE:CUDA>: -dc>)

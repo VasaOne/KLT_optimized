@@ -1,5 +1,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/image.hpp"
+#include "cv_bridge/cv_bridge.hpp"
+#include "std_msgs/msg/header.hpp"
 
 #include <opencv2/opencv.hpp>
 
@@ -13,37 +15,32 @@ class ImageNode : public rclcpp::Node
 {
 	public :
 		ImageNode() : Node("test_klt") {
-			cv::Mat img_grey = cv::imread("./img/concorde.jpg", cv::IMREAD_GRAYSCALE);
+			cv::Mat img_grey = cv::imread("/home/student/Documents/WK/ros2_wk/src/KLT_optimized/rpg_klt/src/img/concorde.jpg", cv::IMREAD_GRAYSCALE);
 			cv::Mat grey;
 			cv::resize(img_grey, grey, cv::Size(WIDTH,HEIGHT));
 			cv::namedWindow("test", cv::WINDOW_AUTOSIZE);
-			cv::imshow("test", grey);
+			cv::imshow("test", img_grey);
 			cv::waitKey(0);
-			cv::destroyWindow("test");
-			this->imageConverter(grey);
-			img.height = HEIGHT;
-			img.width = WIDTH;
+			cv::destroyWindow("test");	
 			pub = this->create_publisher<sensor_msgs::msg::Image>("klt/image", 10);
-			this->loop();
+			this->loop(grey); 
 		}
 
 	private :
 		rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr pub;
-		sensor_msgs::msg::Image img;
-		void imageConverter(cv::Mat grey){
-			for(int x =0; x < WIDTH ;x++ ){
-				for(int y = 0; y<HEIGHT ; y++){
-					this->img.data[x,y] = grey.at<uint8_t>(x,y);
-				}
-			}
-			return;
-		}
+	
 
-		void loop(){
-			int n;
+		void loop(cv::Mat img){
+			char n;
+			cv_bridge::CvImagePtr cv_ptr;
+			sensor_msgs::msg::Image::SharedPtr msg = cv_bridge::CvImage(std_msgs::msg::Header(), "mono8", img).toImageMsg();
 			while(true){
 				std::cin >> n; //just to wait
-				pub->publish(img);	
+				if(n == 'a' ){
+				std::cout <<"end of node test" << std::endl;       
+				return;
+				}
+				pub->publish(*msg.get());	
 			}
 			return;
 		}
