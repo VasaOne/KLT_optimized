@@ -37,13 +37,15 @@ set(CPP_FILES
 	src/utils/obj.hpp
 	src/utils/algo.cpp)
 
-set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-O3; -dc; --gpu-code=sm_50; --gpu-architecture=compute_50)
+set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-O3; -dc )
 CUDA_ADD_EXECUTABLE(klt_node ${CUDA_FILES} ${CPP_FILES})
+
+set_target_properties(klt_node PROPERTIES CUDA_ARCHITECTURES "35;50;72")
 
 
 add_executable(test_klt src/test_klt.cpp)
 ament_target_dependencies(test_klt rclcpp sensor_msgs klt_msg OpenCV std_msgs cv_bridge)
-ament_target_dependencies(klt_node rclcpp sensor_msgs klt_msg OpenCV)
+ament_target_dependencies(klt_node rclcpp sensor_msgs klt_msg OpenCV cv_bridge)
 
 #target_compile_options(klt_node PRIVATE $<$<COMPILE_LANGUAGE:CUDA>: -dc>)
 set_target_properties(klt_node
