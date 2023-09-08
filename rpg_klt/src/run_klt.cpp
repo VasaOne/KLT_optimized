@@ -5,6 +5,10 @@
 #include "klt_msg/msg/ftr.hpp"
 #include "klt_msg/msg/feature_list.hpp"
 
+//just for test, to erase later
+#include "opencv2/opencv.hpp"
+#include "cv_bridge/cv_bridge.hpp"
+
 //c++ include
 #include "klt.hpp"
 #include "obj.hpp"
@@ -24,7 +28,15 @@ class KltNode : public rclcpp::Node
 	KLT klt;
 		
 	void img_callback(const sensor_msgs::msg::Image & image_msg){
+		RCLCPP_INFO(this->get_logger(), "image received");
+		/*
+		cv_bridge::CvImagePtr img =  cv_bridge::toCvCopy(image_msg , "mono8");	
+		cv::namedWindow("test", cv::WINDOW_AUTOSIZE);
+		cv::imshow("test", (*img).image);
+		cv::waitKey(0);
+		cv::destroyWindow("test"); */ // to test if image was well received
 		
+
 		
 	}
 };

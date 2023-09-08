@@ -5,7 +5,7 @@
 class KLT {
 	public:
 		KLT(float threshold, params_t image_param, int max_feature);
-	        features get_features(float image[][5]);	
+	        features get_features(float image[]);	
 		params_t get_block_param();
 		float get_threshold();
 		params_t get_image_param();		
