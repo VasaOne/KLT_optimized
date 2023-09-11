@@ -35,8 +35,24 @@ class KltNode : public rclcpp::Node
 		cv::imshow("test", (*img).image);
 		cv::waitKey(0);
 		cv::destroyWindow("test"); */ // to test if image was well received
+		int img[image_msg.height*image_msg.width];
 		
+		for (int j = 0; j < (image_msg.height*image_msg.width); j++ ){
+			img[j] = image_msg.data[j];
+		}
 
+		features ftr;
+	       	klt.get_features(img, &ftr);
+
+		int x = 0;
+		int y = 0;
+		int scr = 0;
+		for(int i=0; i < N_MAX_FEATURE ; i++){
+			x = ftr.list[i].x;
+			y = ftr.list[i].y;
+			scr = ftr.list[i].score;
+			RCLCPP_INFO(this->get_logger(), "ftr coordinate: (%i,%i) score: %i \n", x, y, scr);
+		}
 		
 	}
 };

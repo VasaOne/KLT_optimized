@@ -4,7 +4,7 @@
 #define max_block_size 256
 #define WIDTH_IMAGE 460
 #define HEIGHT_IMAGE 400
-#define N_MAX_FEATURE
+#define N_MAX_FEATURE  1200
 typedef struct {
 	int width;
 	int height;

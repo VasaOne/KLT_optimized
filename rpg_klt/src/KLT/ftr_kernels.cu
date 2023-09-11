@@ -16,7 +16,7 @@ __device__ int FASTalgorithme(int x, int y,int image[], int threshold){
 }
 
 
-__global__ void kernel_feature_calculus(int image[], params_t block_param, features ftr_final_list, int threshold){
+__global__ void kernel_feature_calculus(int image[], params_t block_param, features *ftr_final_list, int threshold){
 	extern __shared__ coor_t feature_list[]; // list of all the features to find the best one with a reduction after
 	
 	int max_score = 0;
@@ -49,13 +49,49 @@ __global__ void kernel_feature_calculus(int image[], params_t block_param, featu
 		} // if not, we already have the best feature on this position
 	}
 	if(t_id == 0){ // last t_id should be 0 accordind to the reduction process, it containes the best feature
-		ftr_final_list.list[blockIdx.x ] = feature_list[0]; // dont know how to finish that 
+		//ftr_final_list.list[blockIdx.x ] = (*feature_list)[0]; //not finished 
 		//dont forget to uptade the lenght with atomic cuda operation
 	}
 	return;
 }
 
-void wrapper_kernel_feature_calculus(int image[], params_t block_param, features ftr_final_list, int threshold){
-	kernel_feature_calculus<<<1,1, block_param.width*block_param.height*sizeof(coor_t)>>>(image, block_param, ftr_final_list, threshold);
+void wrapper_kernel_feature_calculus(int image[], params_t block_param, params_t img_param, features* ftr_final_list, int threshold){
+
+	//arg management
+	int *img_device;
+	cudaMalloc((void **) &img_device, sizeof(int)*img_param.width*img_param.height );
+	cudaMemcpy(img_device, image, sizeof(int)*img_param.width*img_param.height, cudaMemcpyHostToDevice);
+	features *ftr_device;
+	cudaMalloc((void **) &ftr_device, sizeof(features));
+	cudaMemcpy(ftr_device, ftr_final_list, sizeof(features), cudaMemcpyHostToDevice);
+
+
+        int x_block = (int) img_param.width/block_param.width;
+        int y_block = (int) img_param.height/block_param.height;
+	dim3 blockDimension(x_block, y_block);
+	switch(block_param.width){
+	case 256 :	
+	{
+		dim3 threadsPerBlock(256,1);
+		kernel_feature_calculus<<<blockDimension, threadsPerBlock, block_param.width*block_param.height*sizeof(coor_t)>>>(img_device, block_param, ftr_device, threshold);
+		break;
+	}
+	case 128 :
+	{
+		dim3 threadsPerBlock(128,2);
+		kernel_feature_calculus<<<blockDimension, threadsPerBlock, block_param.width*block_param.height*sizeof(coor_t)>>>(img_device, block_param, ftr_device, threshold);
+		break;
+	}
+	default:
+	{
+		dim3 threadsPerBlock(block_param.width,4);
+		kernel_feature_calculus<<<blockDimension, threadsPerBlock, block_param.width*block_param.height*sizeof(coor_t)>>>(img_device, block_param, ftr_device, threshold);
+		break;
+	}
+	}
+	cudaMemcpy(ftr_final_list, ftr_device, sizeof(int)*img_param.width*img_param.height, cudaMemcpyDeviceToHost);
+	cudaFree(img_device);
+	cudaFree(ftr_device);
+
 	return;
 }

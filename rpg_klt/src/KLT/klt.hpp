@@ -5,7 +5,7 @@
 class KLT {
 	public:
 		KLT(float threshold, params_t image_param, int max_feature);
-	        features get_features(float image[]);	
+	        void get_features(int image[], features* ftr);	
 		params_t get_block_param();
 		float get_threshold();
 		params_t get_image_param();		
@@ -17,4 +17,4 @@ class KLT {
 };
 
 
-void wrapper_kernel_feature_calculus(int image[], params_t block_param, features ftr_final_list, int threshold);
+void wrapper_kernel_feature_calculus(int image[], params_t block_param,params_t img_param, features* ftr_final_list, int threshold);
