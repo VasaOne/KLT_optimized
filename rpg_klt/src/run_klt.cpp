@@ -60,7 +60,7 @@ class KltNode : public rclcpp::Node
 int main(int argc, char* argv[]){
 	rclcpp::init(argc, argv);
 	params_t image_param = {640,600};
-	rclcpp::spin(std::make_shared<KltNode>(30.0,image_param ,3000));
+	rclcpp::spin(std::make_shared<KltNode>(30.0,image_param ,120));
 	rclcpp::shutdown();
 	return 0;
 }

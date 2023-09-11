@@ -49,7 +49,7 @@ __global__ void kernel_feature_calculus(int image[], params_t block_param, featu
 		} // if not, we already have the best feature on this position
 	}
 	if(t_id == 0){ // last t_id should be 0 accordind to the reduction process, it containes the best feature
-		//ftr_final_list.list[blockIdx.x ] = (*feature_list)[0]; //not finished 
+		(*ftr_final_list).list[blockIdx.x * blockDim.y + blockIdx.x] = feature_list[0]; //not finished 
 		//dont forget to uptade the lenght with atomic cuda operation
 	}
 	return;
