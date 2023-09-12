@@ -2,6 +2,7 @@
 #include "klt.hpp"
 #include "hookup.hu"
 #include "fast.hu"
+#include <iostream>
 
 __device__ int FASTalgorithme(int x, int y,int image[], int threshold){
 	int score = 0;
@@ -16,18 +17,20 @@ __device__ int FASTalgorithme(int x, int y,int image[], int threshold){
 }
 
 
-__global__ void kernel_feature_calculus(int image[], params_t block_param, features *ftr_final_list, int threshold){
-	extern __shared__ coor_t feature_list[]; // list of all the features to find the best one with a reduction after
+__global__ void kernel_feature_calculus(int *image, params_t *block_param, coor_t *ftr_final_list, int *threshold){
+
 	
+	extern __shared__ coor_t feature_list[]; // list of all the features to find the best one with a reduction after
+		
 	int max_score = 0;
 	int new_score = 0;
 	int x_px, y_px;
 	//calculus of features
-	for(int line = 0; line < block_param.height / L ; line ++) {
+	for(int line = 0; line < (*block_param).height / L ; line ++) {
 		//new score calculus
-		x_px = blockIdx.x * block_param.width + threadIdx.x;
-		y_px = blockIdx.y * block_param.height + threadIdx.y * (block_param.height / L) + line;
-		new_score = FASTalgorithme( x_px, y_px, image, threshold);
+		x_px = blockIdx.x * (*block_param).width + threadIdx.x;
+		y_px = blockIdx.y * (*block_param).height + threadIdx.y * ((*block_param).height / L) + line;
+		new_score = FASTalgorithme( x_px, y_px, image, *threshold);
 		__syncthreads(); 
 		if (max_score < new_score){
 			new_score = max_score;
@@ -39,8 +42,9 @@ __global__ void kernel_feature_calculus(int image[], params_t block_param, featu
 
 	//reduction to find the best feature within the block 
 	int t_id = threadIdx.x + threadIdx.y * L ;
-	int nb_threads_alive = L * block_param.width / 2;
+	int nb_threads_alive = L *(* block_param).width / 2;
 	while((nb_threads_alive > 1) && (t_id <= nb_threads_alive) ){
+		__syncthreads();
 		nb_threads_alive /=2;
 		if ( feature_list[t_id + nb_threads_alive].score > feature_list[t_id].score){
 			feature_list[t_id].x = feature_list[t_id + nb_threads_alive].x;
@@ -49,49 +53,93 @@ __global__ void kernel_feature_calculus(int image[], params_t block_param, featu
 		} // if not, we already have the best feature on this position
 	}
 	if(t_id == 0){ // last t_id should be 0 accordind to the reduction process, it containes the best feature
-		(*ftr_final_list).list[blockIdx.x * blockDim.y + blockIdx.x] = feature_list[0]; //not finished 
+		ftr_final_list[0].x = 156; //not finished
+	        ftr_final_list[0].y = 232; //not finished
+		ftr_final_list[0].score = 758; //not finished	
 		//dont forget to uptade the lenght with atomic cuda operation
 	}
+	 
+	//printf("ca vaut: %i \n", ftr_final_list[0].x);
+	//ftr_final_list[0].x = 156;
+	//ftr_final_list[0].y = 232;
+	//ftr_final_list[0].score = 758;
 	return;
 }
 
-void wrapper_kernel_feature_calculus(int image[], params_t block_param, params_t img_param, features* ftr_final_list, int threshold){
+__global__ void kernel_tester(int *img, coor_t* ftr, int * thresh, params_t * blk){
+	//printf("marche \n");
+	extern __shared__ coor_t common[];
+	ftr[0].x = (* thresh)+ (*blk).width;
+	ftr[0].y = img[615*364];
+	return;
+}
+
+void wrapper_kernel_feature_calculus(int image[], params_t block_param, params_t img_param, features * ftr_final_list, int threshold){
 
 	//arg management
 	int *img_device;
 	cudaMalloc((void **) &img_device, sizeof(int)*img_param.width*img_param.height );
 	cudaMemcpy(img_device, image, sizeof(int)*img_param.width*img_param.height, cudaMemcpyHostToDevice);
-	features *ftr_device;
-	cudaMalloc((void **) &ftr_device, sizeof(features));
-	cudaMemcpy(ftr_device, ftr_final_list, sizeof(features), cudaMemcpyHostToDevice);
 
+
+	coor_t *lst_ftr_device;
+	cudaMalloc((void **) &lst_ftr_device, sizeof(coor_t)*N_MAX_FEATURE);
+	cudaMemcpy(lst_ftr_device, (*ftr_final_list).list, sizeof(coor_t), cudaMemcpyHostToDevice);
+
+
+	int * thresh_device;
+	int * thresh_host = &threshold;
+	cudaMalloc((void **) &thresh_device, sizeof(int));
+	cudaMemcpy(thresh_device, thresh_host, sizeof(int), cudaMemcpyHostToDevice);
+
+	params_t * block_device;
+	params_t * block_host = &block_param;
+	cudaMalloc((void **) &block_device, sizeof(params_t));
+	cudaMemcpy(block_device, block_host,sizeof(params_t),cudaMemcpyHostToDevice);
 
         int x_block = (int) img_param.width/block_param.width;
         int y_block = (int) img_param.height/block_param.height;
 	dim3 blockDimension(x_block, y_block);
+
+	
+
+	dim3 threadsPerBlock(1,1);
 	switch(block_param.width){
-	case 256 :	
-	{
-		dim3 threadsPerBlock(256,1);
-		kernel_feature_calculus<<<blockDimension, threadsPerBlock, block_param.width*block_param.height*sizeof(coor_t)>>>(img_device, block_param, ftr_device, threshold);
+	case 256 :	{
+		threadsPerBlock.x = block_param.width;
+		threadsPerBlock.y = 1;
 		break;
 	}
-	case 128 :
-	{
-		dim3 threadsPerBlock(128,2);
-		kernel_feature_calculus<<<blockDimension, threadsPerBlock, block_param.width*block_param.height*sizeof(coor_t)>>>(img_device, block_param, ftr_device, threshold);
+	case 128 : {
+                threadsPerBlock.x = block_param.width;
+                threadsPerBlock.y = 2;
 		break;
 	}
-	default:
-	{
-		dim3 threadsPerBlock(block_param.width,4);
-		kernel_feature_calculus<<<blockDimension, threadsPerBlock, block_param.width*block_param.height*sizeof(coor_t)>>>(img_device, block_param, ftr_device, threshold);
+	default: {
+                threadsPerBlock.x = block_param.width;
+                threadsPerBlock.y = 4;
 		break;
 	}
+
 	}
-	cudaMemcpy(ftr_final_list, ftr_device, sizeof(int)*img_param.width*img_param.height, cudaMemcpyDeviceToHost);
+
+	kernel_feature_calculus<<<blockDimension, threadsPerBlock, sizeof(coor_t)*threadsPerBlock.x*threadsPerBlock.y>>>(img_device, block_device, lst_ftr_device, thresh_device);
+	//kernel_tester<<<blockDimension,threadsPerBlock, sizeof(coor_t)*threadsPerBlock.x*threadsPerBlock.y>>>(img_device,lst_ftr_device, thresh_device, block_device);
+	//cudaDeviceSynchronize();
+
+	cudaError_t error = cudaGetLastError();
+	if (error != cudaSuccess) {
+    		printf("CUDA error: %s\n", cudaGetErrorString(error));
+	}
+
+	
+        cudaMemcpy( (*ftr_final_list).list, lst_ftr_device, sizeof(coor_t)*N_MAX_FEATURE, cudaMemcpyDeviceToHost);
+        std::cout << (*ftr_final_list).list[0].x << std::endl;
+        std::cout << (*ftr_final_list).list[0].y << std::endl;
 	cudaFree(img_device);
-	cudaFree(ftr_device);
+	cudaFree(lst_ftr_device);
+	cudaFree(thresh_device);
+	cudaFree(block_device); 
 
 	return;
 }

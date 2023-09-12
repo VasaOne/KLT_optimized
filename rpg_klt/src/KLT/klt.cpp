@@ -10,7 +10,7 @@ KLT::KLT(float threshold, params_t image_param, int max_feature){
 	fit_block(max_feature, image_param, &(this->block_param));
 }
 
-void KLT::get_features(int image[], features *ftr){	
+void KLT::get_features(int image[], features* ftr){	
 	wrapper_kernel_feature_calculus(image, this->block_param, this->image_param, ftr ,this->threshold);
 	return;
 }
