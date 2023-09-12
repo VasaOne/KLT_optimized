@@ -1,7 +1,7 @@
 #ifndef FAST_File
 #define FAST_File
 
- __device__ int  FASTcalculus(int x, int y, int image[], int threshold);
+__device__ int  FASTcalculus(int x, int y, int image[], int threshold);
 __device__ int feature_score_calculus(int x_center, int y_center, int image[]);
 
 #endif

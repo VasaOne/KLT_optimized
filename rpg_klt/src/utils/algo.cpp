@@ -1,4 +1,5 @@
 #include "obj.hpp"
+#include <iostream>
 
 int get_number_feature(params_t image, int dim){
 	int n = (image.width/dim)*(image.height/dim);
@@ -8,12 +9,15 @@ int get_number_feature(params_t image, int dim){
 void fit_block(int N_max_feature, params_t image_param, params_t* block ){
 	int dim = 1;
 	int n_feature = get_number_feature(image_param, dim);
-	for(dim = 1; (dim < max_block_size) && (n_feature > N_max_feature); dim *=2 ){
+	for(dim = 1; (dim < max_block_size) && (n_feature > N_max_feature);dim*=2){
 		n_feature = get_number_feature(image_param, dim);
+
 	
 	}
-	(*block).width = dim;
-	(*block).height = dim;
+	
+	std::cout<< dim/2 << std::endl;
+	(*block).width = dim/2;
+	(*block).height = dim/2;
 	return;
 }
 

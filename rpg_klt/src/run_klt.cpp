@@ -51,7 +51,7 @@ class KltNode : public rclcpp::Node
 			x = ftr.list[i].x;
 			y = ftr.list[i].y;
 			scr = ftr.list[i].score;
-			RCLCPP_INFO(this->get_logger(), "ftr coordinate: (%i,%i) score: %i \n", x, y, scr);
+			RCLCPP_INFO(this->get_logger(), "ftr coordinate: (%i,%i) score: %i iter: %i\n", x, y, scr, i);
 		}
 	}
 };
