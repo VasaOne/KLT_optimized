@@ -23,19 +23,21 @@ include_directories( src/utils/ )
 include_directories( src/KLT/ )
 include_directories( src/HookUp/ )
 
-set(CUDA_FILES 
-	src/HookUp/hookup.cu
-	src/HookUp/hookup.hu
-	src/KLT/ftr_kernels.cu
-	src/utils/tracker.cu
-	src/utils/fast.hu)
+#set(CUDA_FILES 
+#	src/HookUp/hookup.cu
+#	src/HookUp/hookup.hu
+#	src/KLT/ftr_kernels.cu
+#	src/utils/tracker.cu
+#	src/utils/fast.hu)
 
-set(CPP_FILES
-	src/run_klt.cpp
-	src/KLT/klt.hpp
-	src/KLT/klt.cpp
-	src/utils/obj.hpp
-	src/utils/algo.cpp)
+#set(CPP_FILES
+#	src/run_klt.cpp
+#	src/KLT/klt.hpp
+#	src/KLT/klt.cpp
+#	src/utils/obj.hpp
+#	src/utils/algo.cpp)
+
+cuda_add_library(cuda_lib src/utils/fast.hu src/utils.cpp);
 
 set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-O3; -dc )
 CUDA_ADD_EXECUTABLE(klt_node ${CUDA_FILES} ${CPP_FILES})

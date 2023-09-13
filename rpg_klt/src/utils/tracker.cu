@@ -38,7 +38,7 @@ __device__ int  fastBrighter(int center_px, int orbit_px, int threshold){
 
 
 
-__device__ int  FASTcalculus(int x, int y, int image[], int threshold){
+__device__   int  FASTcalculus(int x, int y, int image[], int threshold){
 	int val = 0;
 	for (int element_id = 0; element_id < 16; element_id ++){ // calculus of sum of FAST elements
 		if (range_condition( x, y, element_id ) ){ // check if pixel is inside the range of the image
@@ -48,7 +48,7 @@ __device__ int  FASTcalculus(int x, int y, int image[], int threshold){
 		}
 	}
 	return val;
-}
+} 
 
 __device__ int feature_score_calculus(int x_center, int y_center, int image[]){
 	int score = 0;

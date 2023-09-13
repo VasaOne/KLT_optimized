@@ -4,9 +4,14 @@
 #include "fast.hu"
 #include <iostream>
 
+__device__ int alo(){
+	int x = 5;
+	return x;
+}
+
 __device__ int FASTalgorithme(int x, int y,int image[], int *threshold){
 	int score = 0;
-	FASTcalculus(x,y, image, (*threshold) );
+	score = FASTcalculus(x,y, image, (*threshold) );
 	/*
 	if(get_HKpoint(FASTcalculus(x,y, image, (*threshold) ))){ // test if the consecutive brighter px condition is respected
 		score = feature_score_calculus( x, y, image);
@@ -22,25 +27,26 @@ __global__ void kernel_feature_calculus(int *image, params_t *block_param, coor_
 
 	
 	extern __shared__ coor_t feature_list[]; // list of all the features to find the best one with a reduction after
-	int t_id = threadIdx.x + threadIdx.y * blockIdx.y;
+	int t_id = threadIdx.x + threadIdx.y * blockDim.x;
 	int max_score = 0;
 	int new_score = 0;
 	int x_px, y_px; 
 	//calculus of features
-	for(int line = 0; line < (*block_param).height / blockIdx.y ; line ++) {
+	for(int line = 0; line < (*block_param).height / blockDim.y ; line ++) {
 		//new score calculus
 		x_px = blockIdx.x * (*block_param).width + threadIdx.x;
-		y_px = blockIdx.y * (*block_param).height + threadIdx.y * ((*block_param).height / blockIdx.y) + line;
+		y_px = blockIdx.y * (*block_param).height + threadIdx.y + line*blockDim.y;
 		new_score = FASTalgorithme( x_px, y_px, image, threshold);
 
-		//__syncthreads(); 
+		__syncthreads(); 
 		if (max_score < new_score){
 			new_score = max_score;
 			feature_list[t_id].x = x_px;
 			feature_list[t_id].y = y_px;
 			feature_list[t_id].score = max_score;
 		}
-	}
+	} 
+
 /*
 	//reduction to find the best feature within the block 
 	int nb_threads_alive = blockIdx.y *(* block_param).width / 2;
@@ -81,7 +87,7 @@ void wrapper_kernel_feature_calculus(int image[], params_t block_param, params_t
 
 	coor_t *lst_ftr_device;
 	cudaMalloc((void **) &lst_ftr_device, sizeof(coor_t)*N_MAX_FEATURE);
-	cudaMemcpy(lst_ftr_device, (*ftr_final_list).list, sizeof(coor_t), cudaMemcpyHostToDevice);
+	//cudaMemcpy(lst_ftr_device, (*ftr_final_list).list, sizeof(coor_t), cudaMemcpyHostToDevice);
 
 
 	int * thresh_device;
@@ -97,7 +103,6 @@ void wrapper_kernel_feature_calculus(int image[], params_t block_param, params_t
         int x_block = (int) img_param.width/block_param.width;
         int y_block = (int) img_param.height/block_param.height;
 	dim3 blockDimension(x_block, y_block);
-
 	
 
 	dim3 threadsPerBlock(1,1);
