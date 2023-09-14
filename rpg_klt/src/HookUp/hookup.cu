@@ -1,19 +1,20 @@
 #include <stdio.h>
 #include "hookup.hu"
+#include "klt.hpp"
 
 
 __device__ char HookUpTable[HK_size];
 
 __device__ void set_HKpoint(int addr){
-	HookUpTable[addr & 0x1FF] = HookUpTable[addr & 0x1FF] | (1 << (addr >> 13));
+	HookUpTable[addr & 0x1FFF] = HookUpTable[addr & 0x1FFF] | (1 << (addr >> 13));
 }
 
 __device__ void clear_HKpoint(int addr){
-	HookUpTable[addr & 0x1FF] = HookUpTable[addr & 0x1FF] & (~(1 << (addr >> 13)));
+	HookUpTable[addr & 0x1FFF] = HookUpTable[addr & 0x1FFF] & (~(1 << (addr >> 13)));
 }
 
 __device__ int get_HKpoint(int addr){
-	return HookUpTable[addr & 0x1FF] & (1 << (addr >> 13));
+	return HookUpTable[addr & 0x1FFF] & (1 << (addr >> 13));
 }
 
 __global__ void HookUpInit(int pointcondition){
@@ -34,6 +35,12 @@ __global__ void HookUpInit(int pointcondition){
 		}
 	}
 	clear_HKpoint(addr);
+}
+
+
+void wrapper_kernel_HKinit(int pointcondition){
+	HookUpInit<<<32,256>>>(pointcondition);
+	return;
 }
 
 /*

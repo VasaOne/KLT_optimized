@@ -16,5 +16,5 @@ class KLT {
 		params_t block_param;
 };
 
-
+void wrapper_kernel_HKinit(int pointcondition);
 void wrapper_kernel_feature_calculus(int image[], params_t block_param,params_t img_param, features* ftr_final_list, int threshold);

@@ -4,34 +4,30 @@
 #include "fast.hu"
 #include <iostream>
 
-__device__ int alo(){
-	int x = 5;
-	return x;
-}
 
 __device__ int FASTalgorithme(int x, int y,int image[], int *threshold){
 	int score = 0;
-	score = FASTcalculus(x,y, image, (*threshold) );
-	/*
+	//score = FASTcalculus(x,y, image, (*threshold) );
+
 	if(get_HKpoint(FASTcalculus(x,y, image, (*threshold) ))){ // test if the consecutive brighter px condition is respected
 		score = feature_score_calculus( x, y, image);
 	}
 	else {
 		score = 0;
-	}*/
+	}
 	return score;
 }
 
 
 __global__ void kernel_feature_calculus(int *image, params_t *block_param, coor_t *ftr_final_list, int *threshold){
 
-	
 	extern __shared__ coor_t feature_list[]; // list of all the features to find the best one with a reduction after
 	int t_id = threadIdx.x + threadIdx.y * blockDim.x;
 	int max_score = 0;
 	int new_score = 0;
 	int x_px, y_px; 
 	//calculus of features
+
 	for(int line = 0; line < (*block_param).height / blockDim.y ; line ++) {
 		//new score calculus
 		x_px = blockIdx.x * (*block_param).width + threadIdx.x;
@@ -40,31 +36,32 @@ __global__ void kernel_feature_calculus(int *image, params_t *block_param, coor_
 
 		__syncthreads(); 
 		if (max_score < new_score){
-			new_score = max_score;
+			max_score = new_score;
 			feature_list[t_id].x = x_px;
 			feature_list[t_id].y = y_px;
 			feature_list[t_id].score = max_score;
 		}
 	} 
 
-/*
+
 	//reduction to find the best feature within the block 
-	int nb_threads_alive = blockIdx.y *(* block_param).width / 2;
+	int nb_threads_alive = blockDim.y * (* block_param).width / 2;
 	while((nb_threads_alive > 1) && (t_id <= nb_threads_alive) ){
-		//__syncthreads();
+		__syncthreads();
 		nb_threads_alive /=2;
 		if ( feature_list[t_id + nb_threads_alive].score > feature_list[t_id].score){
 			feature_list[t_id].x = feature_list[t_id + nb_threads_alive].x;
 			feature_list[t_id].y = feature_list[t_id + nb_threads_alive].y;
 			feature_list[t_id].score = feature_list[t_id + nb_threads_alive].score;
 		} // if not, we already have the best feature on this position
-	}
+	} 
 	if(t_id == 0){ // last t_id should be 0 accordind to the reduction process, it containes the best feature
-		ftr_final_list[0].x = feature_list[0].x; //not finished
-	        ftr_final_list[0].y = feature_list[0].y; //not finished
-		ftr_final_list[0].score = feature_list[0].score; //not finished	
+		ftr_final_list[blockIdx.x + blockIdx.y * gridDim.x].x = feature_list[0].x; //not finished
+	        ftr_final_list[blockIdx.x + blockIdx.y * gridDim.x].y = feature_list[0].y; //not finished
+		ftr_final_list[blockIdx.x + blockIdx.y * gridDim.x].score = feature_list[0].score; //not finished	
+		printf("block id: %i \n", blockIdx.x + blockIdx.y * gridDim.x);
 		//dont forget to uptade the lenght with atomic cuda operation
-	}*/
+	}
 	 
 	return;
 }
@@ -124,10 +121,10 @@ void wrapper_kernel_feature_calculus(int image[], params_t block_param, params_t
 	}
 
 	}
-
-	kernel_feature_calculus<<<blockDimension, threadsPerBlock, sizeof(coor_t)*threadsPerBlock.x*threadsPerBlock.y>>>(img_device, block_device, lst_ftr_device, thresh_device);
+	std::cout << threadsPerBlock.x << "," << threadsPerBlock.y <<std::endl;
+	kernel_feature_calculus<<<blockDimension, threadsPerBlock, sizeof(coor_t)*threadsPerBlock.x * threadsPerBlock.y>>>(img_device, block_device, lst_ftr_device, thresh_device);
 	//kernel_tester<<<blockDimension,threadsPerBlock, sizeof(coor_t)*threadsPerBlock.x*threadsPerBlock.y>>>(img_device,lst_ftr_device, thresh_device, block_device);
-	//cudaDeviceSynchronize();
+	cudaDeviceSynchronize();
 
 	cudaError_t error = cudaGetLastError();
 	if (error != cudaSuccess) {

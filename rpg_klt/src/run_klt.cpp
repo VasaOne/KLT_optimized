@@ -29,12 +29,6 @@ class KltNode : public rclcpp::Node
 		
 	void img_callback(const sensor_msgs::msg::Image & image_msg){
 		RCLCPP_INFO(this->get_logger(), "image received");
-		/*
-		cv_bridge::CvImagePtr img =  cv_bridge::toCvCopy(image_msg , "mono8");	
-		cv::namedWindow("test", cv::WINDOW_AUTOSIZE);
-		cv::imshow("test", (*img).image);
-		cv::waitKey(0);
-		cv::destroyWindow("test"); */ // to test if image was well received
 		int img[image_msg.height*image_msg.width];
 		
 		for (int j = 0; j < (image_msg.height*image_msg.width); j++ ){
@@ -43,23 +37,31 @@ class KltNode : public rclcpp::Node
 
 		features ftr;
 	       	klt.get_features(img, &ftr);
-
+		
+		cv_bridge::CvImagePtr image = cv_bridge::toCvCopy(image_msg , "rgb8");
 		int x = 0;
 		int y = 0;
 		int scr = 0;
+		cv::Point pt;
 		for(int i=0; i < N_MAX_FEATURE ; i++){
 			x = ftr.list[i].x;
 			y = ftr.list[i].y;
 			scr = ftr.list[i].score;
-			RCLCPP_INFO(this->get_logger(), "ftr coordinate: (%i,%i) score: %i iter: %i\n", x, y, scr, i);
+			//RCLCPP_INFO(this->get_logger(), "ftr coordinate: (%i,%i) score: %i iter: %i\n", x, y, scr, i);
+			pt.x = ftr.list[i].x;
+			pt.y = ftr.list[i].y;
+			cv::circle((*image).image, pt, 1, cv::Scalar(255,0,0), cv::FILLED);
 		}
+		cv::namedWindow("test", cv::WINDOW_AUTOSIZE);
+		cv::imshow("test", (*image).image);
+		cv::waitKey(0);
 	}
 };
 
 int main(int argc, char* argv[]){
 	rclcpp::init(argc, argv);
 	params_t image_param = {640,600};
-	rclcpp::spin(std::make_shared<KltNode>(30.0,image_param ,120));
+	rclcpp::spin(std::make_shared<KltNode>(10.0,image_param ,120));
 	rclcpp::shutdown();
 	return 0;
 }

@@ -2,11 +2,11 @@
 #include <iostream>
 
 
-
 KLT::KLT(float threshold, params_t image_param, int max_feature){
 	this->max_feature = max_feature;
 	this->image_param = image_param;
 	this->threshold = threshold;
+	wrapper_kernel_HKinit(2);
 	fit_block(max_feature, image_param, &(this->block_param));
 }
 
@@ -26,6 +26,8 @@ float KLT::get_threshold(){
 params_t KLT::get_image_param(){
 	return this->image_param;
 }
+
+
 
 /*
 int main() {

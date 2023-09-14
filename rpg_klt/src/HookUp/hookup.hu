@@ -13,4 +13,5 @@ __device__ int get_HKpoint(int addr);
 
 __global__ void HookUpInit(int pointcondition);
 
+void wrapper_kernel_HKinit(int pointcondition);
 #endif
