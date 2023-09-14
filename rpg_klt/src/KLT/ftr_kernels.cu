@@ -7,9 +7,8 @@
 
 __device__ int FASTalgorithme(int x, int y,int image[], int *threshold){
 	int score = 0;
-	//score = FASTcalculus(x,y, image, (*threshold) );
-
 	if(get_HKpoint(FASTcalculus(x,y, image, (*threshold) ))){ // test if the consecutive brighter px condition is respected
+//	if(1) {
 		score = feature_score_calculus( x, y, image);
 	}
 	else {
@@ -27,20 +26,21 @@ __global__ void kernel_feature_calculus(int *image, params_t *block_param, coor_
 	int new_score = 0;
 	int x_px, y_px; 
 	//calculus of features
+	x_px = blockIdx.x * (*block_param).width + threadIdx.x;
+	y_px = blockIdx.y * (*block_param).height + threadIdx.y;	
 
-	for(int line = 0; line < (*block_param).height / blockDim.y ; line ++) {
+	for(int line = 0; line < ((*block_param).height / blockDim.y) ; line ++) {
 		//new score calculus
-		x_px = blockIdx.x * (*block_param).width + threadIdx.x;
-		y_px = blockIdx.y * (*block_param).height + threadIdx.y + line*blockDim.y;
+		y_px = y_px +  blockDim.y;
 		new_score = FASTalgorithme( x_px, y_px, image, threshold);
-
+		
 		__syncthreads(); 
 		if (max_score < new_score){
 			max_score = new_score;
 			feature_list[t_id].x = x_px;
 			feature_list[t_id].y = y_px;
 			feature_list[t_id].score = max_score;
-		}
+		} 
 	} 
 
 
@@ -59,7 +59,7 @@ __global__ void kernel_feature_calculus(int *image, params_t *block_param, coor_
 		ftr_final_list[blockIdx.x + blockIdx.y * gridDim.x].x = feature_list[0].x; //not finished
 	        ftr_final_list[blockIdx.x + blockIdx.y * gridDim.x].y = feature_list[0].y; //not finished
 		ftr_final_list[blockIdx.x + blockIdx.y * gridDim.x].score = feature_list[0].score; //not finished	
-		printf("block id: %i \n", blockIdx.x + blockIdx.y * gridDim.x);
+		//printf("block %i : (%i,%i) %i\n", blockIdx.x + blockIdx.y * gridDim.x, x_px, y_px, ((*block_param).height / blockDim.y));
 		//dont forget to uptade the lenght with atomic cuda operation
 	}
 	 
@@ -124,7 +124,7 @@ void wrapper_kernel_feature_calculus(int image[], params_t block_param, params_t
 	std::cout << threadsPerBlock.x << "," << threadsPerBlock.y <<std::endl;
 	kernel_feature_calculus<<<blockDimension, threadsPerBlock, sizeof(coor_t)*threadsPerBlock.x * threadsPerBlock.y>>>(img_device, block_device, lst_ftr_device, thresh_device);
 	//kernel_tester<<<blockDimension,threadsPerBlock, sizeof(coor_t)*threadsPerBlock.x*threadsPerBlock.y>>>(img_device,lst_ftr_device, thresh_device, block_device);
-	cudaDeviceSynchronize();
+	//cudaDeviceSynchronize();
 
 	cudaError_t error = cudaGetLastError();
 	if (error != cudaSuccess) {

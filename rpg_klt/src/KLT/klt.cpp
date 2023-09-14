@@ -6,7 +6,7 @@ KLT::KLT(float threshold, params_t image_param, int max_feature){
 	this->max_feature = max_feature;
 	this->image_param = image_param;
 	this->threshold = threshold;
-	wrapper_kernel_HKinit(2);
+	wrapper_kernel_HKinit(15);
 	fit_block(max_feature, image_param, &(this->block_param));
 }
 

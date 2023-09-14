@@ -47,10 +47,10 @@ class KltNode : public rclcpp::Node
 			x = ftr.list[i].x;
 			y = ftr.list[i].y;
 			scr = ftr.list[i].score;
-			//RCLCPP_INFO(this->get_logger(), "ftr coordinate: (%i,%i) score: %i iter: %i\n", x, y, scr, i);
+			RCLCPP_INFO(this->get_logger(), "ftr coordinate: (%i,%i) score: %i iter: %i\n", x, y, scr, i);
 			pt.x = ftr.list[i].x;
 			pt.y = ftr.list[i].y;
-			cv::circle((*image).image, pt, 1, cv::Scalar(255,0,0), cv::FILLED);
+			cv::circle((*image).image, pt, 5, cv::Scalar(255,0,0), cv::FILLED);
 		}
 		cv::namedWindow("test", cv::WINDOW_AUTOSIZE);
 		cv::imshow("test", (*image).image);
@@ -61,7 +61,7 @@ class KltNode : public rclcpp::Node
 int main(int argc, char* argv[]){
 	rclcpp::init(argc, argv);
 	params_t image_param = {640,600};
-	rclcpp::spin(std::make_shared<KltNode>(10.0,image_param ,120));
+	rclcpp::spin(std::make_shared<KltNode>(1.0,image_param ,12000));
 	rclcpp::shutdown();
 	return 0;
 }
